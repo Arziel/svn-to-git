@@ -21,4 +21,5 @@ gen
 /**/.env.local
 
 /**/config.local.php
+src
 src/*

@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# -----------------------------------------
+# Init Constants
+# -----------------------------------------
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source ./_injector.sh
 
 
 # ------------------------------
@@ -19,12 +26,18 @@ SVN_REPOSITORY=0
 #	fi
 #done
 
+injector svn root
+
+
 echo; echo $SVN_REPOSITORY
 
-[[ -e ./svn ]] && rm -rf ./svn
+docker build _docker/svn/. \
+	--build-arg DOCKER_UID=$UID \
+	--tag svn-to-git
 
-mkdir -p ./svn
-
-docker build . --tag svn-to-git
-docker run -it svn-to-git git svn clone	$*
+docker run -it \
+	--volume $DIR/src/:/var/docker \
+	--volume $DIR/svn/:/home/dockeruser/.subversion \
+	--volume $DIR/ssh/:/home/dockeruser/.ssh \
+	svn-to-git
 
